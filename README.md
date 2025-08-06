@@ -10,7 +10,7 @@ Rewritten from JavaScript [dns-zonefile](https://github.com/elgs/dns-zonefile)
 ## Cargo.toml
 
 ```toml
-dns-zonefile = { git="https://github.con/vazw/dns-zonefile" }
+dns-zonefile = { git="https://github.com/vazw/dns-zonefile.git" }
 ```
 
 # Usage
