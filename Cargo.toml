@@ -1,0 +1,17 @@
+[package]
+name = "dns-zonefile"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+chrono = { workspace = true }
+regex = { workspace = true }
+serde = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
+
+[lib]
+name = "dns_zonefile"
+path = "src/lib.rs"
+doctest = false
