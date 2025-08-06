@@ -171,16 +171,10 @@ fn parse_ds(rr_data: &NormalizedRR, records_so_far: &Vec<Ds>) -> Ds {
     }
 }
 
-fn flatten_soa(text: &str) -> String {
-    // This regex is designed to find a multi-line SOA record.
-    // (?is) flags: i = case-insensitive, s = dot matches newline
-    let re = Regex::new(r"(?is)(SOA\s+.*?\s*\([\s\S]*?\))").unwrap();
-    
+fn flatten_soa(re: &Regex, re_whitespace: &Regex, text: &str) -> String {
     if let Some(captures) = re.captures(text) {
         let soa_block = &captures[1];
         
-        // Replace all whitespace sequences with a single space and remove parentheses.
-        let re_whitespace = Regex::new(r"\s+").unwrap();
         let flattened_soa = re_whitespace.replace_all(soa_block, " ");
         let flattened_soa = flattened_soa.replace(&['(', ')'][..], " ");
 
@@ -374,8 +368,12 @@ fn parse_rrs(text: &str) -> DnsZone {
     zone
 }
 
-pub fn parse(text: &str) -> DnsZone {
+pub fn parse(re_ws: &Regex, re_soa: &Regex,text: &str) -> Result<DnsZone, String> {
     let without_comments = remove_comments(text);
-    let flattened = flatten_soa(&without_comments);
-    parse_rrs(&flattened)
+    let flattened = flatten_soa(re_soa, re_ws, &without_comments);
+    let dns_zone = parse_rrs(&flattened);
+    if dns_zone.is_empty() {
+        return Err("Invalid DNS Zonefile".to_owned());
+    }
+    Ok(dns_zone)
 }

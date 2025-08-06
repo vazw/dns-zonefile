@@ -1,10 +1,43 @@
-pub mod dns_structs;
-pub mod generator;
-pub mod parser;
+mod dns_structs;
+mod generator;
+mod parser;
 
 pub use dns_structs::*;
-pub use generator::*;
-pub use parser::*;
+use regex::Regex;
+
+struct ContextRegex {
+    parser: Regex,
+    parser_soa: Regex,
+    generator: Regex
+}
+
+pub struct DnsZonefile {
+    ctx: ContextRegex
+}
+
+/// DnsZonefile
+///
+impl DnsZonefile {
+    /// generate Zonefile from DnsZone struct
+    pub fn generate(&self, dns_zone: &DnsZone, template: Option<&str>) -> String {
+        generator::generate(&self.ctx.generator, dns_zone, template)
+    }
+    /// parse data from zonfile to DnsZone struct then can convert into json
+    /// return error for empty zone data rather then all none!
+    pub fn parse(&self, data: &str) -> Result<DnsZone, String> {
+        parser::parse(&self.ctx.parser, &self.ctx.parser_soa, data)
+    }
+}
+
+impl Default for DnsZonefile {
+    fn default() -> Self {
+        let parser = Regex::new(r"\s+").unwrap();
+        let generator = Regex::new(r"\n{2,}").expect("valid pattern");
+        let parser_soa = Regex::new(r"(?is)(SOA\s+.*?\s*\([\s\S]*?\))").expect("valid pattern");
+        Self { ctx: ContextRegex { parser, parser_soa, generator } }
+    }
+}
+
 
 
 #[cfg(test)]

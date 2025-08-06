@@ -1,4 +1,4 @@
-use serde::{Serialize,Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub struct Soa {
@@ -145,6 +145,25 @@ pub struct DnsZone {
     pub caa: Option<Vec<Caa>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ds: Option<Vec<Ds>>,
+}
+
+impl DnsZone {
+    pub fn is_empty(&self) -> bool {
+        self.origin.is_none()
+            && self.ttl.is_none()
+            && self.soa.is_none()
+            && self.ns.is_none()
+            && self.a.is_none()
+            && self.aaaa.is_none()
+            && self.cname.is_none()
+            && self.mx.is_none()
+            && self.txt.is_none()
+            && self.ptr.is_none()
+            && self.srv.is_none()
+            && self.spf.is_none()
+            && self.caa.is_none()
+            && self.ds.is_none()
+    }
 }
 
 pub const DEFAULT_TEMPLATE: &str = r#"; Zone: {zone}
