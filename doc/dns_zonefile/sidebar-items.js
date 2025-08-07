@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["DEFAULT_TEMPLATE"],"struct":["A","Aaaa","Caa","Cname","DnsZone","DnsZonefile","Ds","Mx","Ns","Ptr","Soa","Spf","Srv","Txt"]};
