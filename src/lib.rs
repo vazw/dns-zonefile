@@ -5,12 +5,14 @@ mod parser;
 pub use dns_structs::*;
 use regex::Regex;
 
+#[derive(Debug, Clone)]
 struct ContextRegex {
     parser: Regex,
     parser_soa: Regex,
     generator: Regex
 }
 
+#[derive(Debug, Clone)]
 pub struct DnsZonefile {
     ctx: ContextRegex
 }
@@ -19,12 +21,13 @@ pub struct DnsZonefile {
 /// This is main struct 
 /// an interface to generate and parse function
 /// which will create Regex resource once using `DnsZonefile::default()`
+/// if you want to use with serde enable feature `serde`
+/// there is also `paperclip` feature use to expose the struct to openapi specs
 /// ```rust
 /// use dns_zonefile::{DnsZone, DnsZonefile};
-/// 
-/// fn main() {
-///     let dns_zonefile = DnsZonefile::default();
-///     let zonefile_example = r#"
+///
+/// let dns = DnsZonefile::default();
+/// let zonefile_example = r#"
 /// $ORIGIN MYDOMAIN.COM.
 /// $TTL 3600
 /// @    IN    SOA    NS1.NAMESERVER.NET.    HOSTMASTER.MYDOMAIN.COM.    (
@@ -51,12 +54,11 @@ pub struct DnsZonefile {
 /// A  200 AAAA  2001:db8::1
 /// "#;
 /// 
-///     let Ok(zone_data) = dns_zonefile.parse(zonefile_example) else { return;};
-///     println!("{}", serde_json::to_string_pretty(&zone_data).unwrap());
+/// let Ok(zone_data) = dns.parse(zonefile_example) else { return;};
+/// println!("{}", serde_json::to_string_pretty(&zone_data).unwrap());
 /// 
-///     let zonefile = dns_zonefile.generate(&zone_data, None);
-///     println!("{zonefile}");
-/// }
+/// let zonefile = dns.generate(&zone_data, None);
+/// println!("{zonefile}");
 /// ```
 impl DnsZonefile {
     /// generate Zonefile string from DnsZone data struct like so

@@ -12,7 +12,7 @@ pub struct NormalizedRR {
 
 fn get_name(
     rr_data: &NormalizedRR,
-    records_so_far: &Vec<impl GetName>,
+    records_so_far: &[impl GetName],
 ) -> String {
     if rr_data.has_name {
         rr_data.tokens[0].clone()
@@ -51,7 +51,7 @@ fn parse_soa(rr_tokens: &[&str]) -> Soa {
     }
 }
 
-fn parse_ns(rr_data: &NormalizedRR, records_so_far: &Vec<Ns>) -> Ns {
+fn parse_ns(rr_data: &NormalizedRR, records_so_far: &[Ns]) -> Ns {
     let name = get_name(rr_data, records_so_far);
     let l = rr_data.tokens.len();
     Ns {
@@ -61,7 +61,7 @@ fn parse_ns(rr_data: &NormalizedRR, records_so_far: &Vec<Ns>) -> Ns {
     }
 }
 
-fn parse_a(rr_data: &NormalizedRR, records_so_far: &Vec<A>) -> A {
+fn parse_a(rr_data: &NormalizedRR, records_so_far: &[A]) -> A {
     let name = get_name(rr_data, records_so_far);
     let l = rr_data.tokens.len();
     A {
@@ -71,7 +71,7 @@ fn parse_a(rr_data: &NormalizedRR, records_so_far: &Vec<A>) -> A {
     }
 }
 
-fn parse_aaaa(rr_data: &NormalizedRR, records_so_far: &Vec<Aaaa>) -> Aaaa {
+fn parse_aaaa(rr_data: &NormalizedRR, records_so_far: &[Aaaa]) -> Aaaa {
     let name = get_name(rr_data, records_so_far);
     let l = rr_data.tokens.len();
     Aaaa {
@@ -81,7 +81,7 @@ fn parse_aaaa(rr_data: &NormalizedRR, records_so_far: &Vec<Aaaa>) -> Aaaa {
     }
 }
 
-fn parse_cname(rr_data: &NormalizedRR, records_so_far: &Vec<Cname>) -> Cname {
+fn parse_cname(rr_data: &NormalizedRR, records_so_far: &[Cname]) -> Cname {
     let name = get_name(rr_data, records_so_far);
     let l = rr_data.tokens.len();
     Cname {
@@ -91,7 +91,7 @@ fn parse_cname(rr_data: &NormalizedRR, records_so_far: &Vec<Cname>) -> Cname {
     }
 }
 
-fn parse_mx(rr_data: &NormalizedRR, records_so_far: &Vec<Mx>) -> Mx {
+fn parse_mx(rr_data: &NormalizedRR, records_so_far: &[Mx]) -> Mx {
     let name = get_name(rr_data, records_so_far);
     let l = rr_data.tokens.len();
     Mx {
@@ -102,7 +102,7 @@ fn parse_mx(rr_data: &NormalizedRR, records_so_far: &Vec<Mx>) -> Mx {
     }
 }
 
-fn parse_txt(rr_data: &NormalizedRR, records_so_far: &Vec<Txt>) -> Txt {
+fn parse_txt(rr_data: &NormalizedRR, records_so_far: &[Txt]) -> Txt {
     let name = get_name(rr_data, records_so_far);
     let txt_array = &rr_data.tokens[rr_data.type_index + 1..];
     Txt {
@@ -112,7 +112,7 @@ fn parse_txt(rr_data: &NormalizedRR, records_so_far: &Vec<Txt>) -> Txt {
     }
 }
 
-fn parse_ptr(rr_data: &NormalizedRR, records_so_far: &Vec<Ptr>, current_origin: &str) -> Ptr {
+fn parse_ptr(rr_data: &NormalizedRR, records_so_far: &[Ptr], current_origin: &str) -> Ptr {
     let name = get_name(rr_data, records_so_far);
     let l = rr_data.tokens.len();
     Ptr {
@@ -123,7 +123,7 @@ fn parse_ptr(rr_data: &NormalizedRR, records_so_far: &Vec<Ptr>, current_origin: 
     }
 }
 
-fn parse_srv(rr_data: &NormalizedRR, records_so_far: &Vec<Srv>) -> Srv {
+fn parse_srv(rr_data: &NormalizedRR, records_so_far: &[Srv]) -> Srv {
     let name = get_name(rr_data, records_so_far);
     let l = rr_data.tokens.len();
     Srv {
@@ -136,7 +136,7 @@ fn parse_srv(rr_data: &NormalizedRR, records_so_far: &Vec<Srv>) -> Srv {
     }
 }
 
-fn parse_spf(rr_data: &NormalizedRR, records_so_far: &Vec<Spf>) -> Spf {
+fn parse_spf(rr_data: &NormalizedRR, records_so_far: &[Spf]) -> Spf {
     let name = get_name(rr_data, records_so_far);
     let data_array = &rr_data.tokens[rr_data.type_index + 1..];
     Spf {
@@ -146,7 +146,7 @@ fn parse_spf(rr_data: &NormalizedRR, records_so_far: &Vec<Spf>) -> Spf {
     }
 }
 
-fn parse_caa(rr_data: &NormalizedRR, records_so_far: &Vec<Caa>) -> Caa {
+fn parse_caa(rr_data: &NormalizedRR, records_so_far: &[Caa]) -> Caa {
     let name = get_name(rr_data, records_so_far);
     let l = rr_data.tokens.len();
     Caa {
@@ -158,7 +158,7 @@ fn parse_caa(rr_data: &NormalizedRR, records_so_far: &Vec<Caa>) -> Caa {
     }
 }
 
-fn parse_ds(rr_data: &NormalizedRR, records_so_far: &Vec<Ds>) -> Ds {
+fn parse_ds(rr_data: &NormalizedRR, records_so_far: &[Ds]) -> Ds {
     let name = get_name(rr_data, records_so_far);
     let l = rr_data.tokens.len();
     Ds {
@@ -174,14 +174,14 @@ fn parse_ds(rr_data: &NormalizedRR, records_so_far: &Vec<Ds>) -> Ds {
 fn flatten_soa(re: &Regex, re_whitespace: &Regex, text: &str) -> String {
     if let Some(captures) = re.captures(text) {
         let soa_block = &captures[1];
-        
+
         let flattened_soa = re_whitespace.replace_all(soa_block, " ");
         let flattened_soa = flattened_soa.replace(&['(', ')'][..], " ");
 
         // Reconstruct the text with the flattened SOA record
         return text.replace(soa_block, &flattened_soa);
     }
-    
+
     text.to_string()
 }
 
@@ -228,7 +228,7 @@ fn split_args(input: &str, sep: Option<char>, keep_quotes: bool) -> Vec<String> 
         // Handle case where line ends with a separator, e.g., in `remove_comments`
         result.push("".to_string());
     }
-    
+
     // For whitespace separation, filter out empty strings that result from multiple spaces.
     if sep.is_none() {
         result.into_iter().filter(|s| !s.is_empty()).collect()
@@ -246,7 +246,7 @@ fn remove_comments(text: &str) -> String {
 
         // Split by semicolon to find comments, keeping quotes.
         let tokens = split_args(line, Some(';'), true);
-        
+
         let mut first_part = String::new();
         for (i, token) in tokens.iter().enumerate() {
             first_part.push_str(token);
@@ -279,9 +279,9 @@ fn normalize_rr(rr: &str) -> NormalizedRR {
     if has_ttl {
         type_index += 1;
     }
-    
+
     // Adjust for 'IN' class
-    if rr_tokens.get(type_index).map_or(false, |s| s == "IN") {
+    if rr_tokens.get(type_index).is_some_and(|s| s == "IN") {
         type_index += 1;
     }
 
