@@ -1,23 +1,51 @@
+use std::{fmt::Display, str::FromStr};
+
 #[cfg(feature="serde")]
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature="paperclip")]
 use paperclip::actix::Apiv2Schema;
 
-#[derive(Debug, Default, PartialEq, Clone)]
+#[cfg(feature="apistos")]
+use apistos::ApiComponent;
+#[cfg(feature="apistos")]
+use schemars::JsonSchema;
+
+#[derive(Debug, PartialEq, Clone)]
 #[cfg_attr(feature="paperclip", derive(Apiv2Schema))]
 #[cfg_attr(feature="serde", derive(Deserialize, Serialize))]
-pub struct Soa {
-    pub name: String,
-    pub minimum: u32,
-    pub expire: u32,
-    pub retry: u32,
-    pub refresh: u32,
-    pub serial: u32,
-    pub rname: String,
-    pub mname: String,
-    #[cfg_attr(feature="serde", serde(skip_serializing_if = "Option::is_none"))]
-    pub ttl: Option<u32>,
+#[cfg_attr(feature="serde", serde(untagged))]
+#[cfg_attr(feature="apistos", derive(ApiComponent, JsonSchema))]
+pub enum Serial {
+    Number(u32),
+    String(String)
+}
+
+impl Default for Serial {
+    fn default() -> Self {
+        Self::Number(0)
+    }
+}
+
+impl FromStr for Serial {
+    type Err = ();
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let ret = s.parse::<u32>();
+        if let Ok(num) = ret {
+            Ok(Self::Number(num))
+        } else {
+            Ok(Self::String(s.to_owned()))
+        }
+    }
+}
+
+impl Display for Serial {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Serial::String(s) => write!(f, "{}", s),
+            Serial::Number(n) => write!(f, "{}", n)
+        }
+    }
 }
 
 #[derive(Debug, Default, PartialEq, Clone)]
@@ -33,6 +61,7 @@ pub struct Ns {
 #[derive(Debug, Default, PartialEq, Clone)]
 #[cfg_attr(feature="paperclip", derive(Apiv2Schema))]
 #[cfg_attr(feature="serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature="apistos", derive(ApiComponent, JsonSchema))]
 pub struct A {
     pub name: String,
     pub ip: String,
@@ -43,6 +72,7 @@ pub struct A {
 #[derive(Debug, Default, PartialEq, Clone)]
 #[cfg_attr(feature="paperclip", derive(Apiv2Schema))]
 #[cfg_attr(feature="serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature="apistos", derive(ApiComponent, JsonSchema))]
 pub struct Aaaa {
     pub name: String,
     pub ip: String,
@@ -53,6 +83,7 @@ pub struct Aaaa {
 #[derive(Debug, Default, PartialEq, Clone)]
 #[cfg_attr(feature="paperclip", derive(Apiv2Schema))]
 #[cfg_attr(feature="serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature="apistos", derive(ApiComponent, JsonSchema))]
 pub struct Cname {
     pub name: String,
     pub alias: String,
@@ -63,6 +94,7 @@ pub struct Cname {
 #[derive(Debug, Default, PartialEq, Clone)]
 #[cfg_attr(feature="paperclip", derive(Apiv2Schema))]
 #[cfg_attr(feature="serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature="apistos", derive(ApiComponent, JsonSchema))]
 pub struct Mx {
     pub name: String,
     pub preference: u16,
@@ -74,6 +106,7 @@ pub struct Mx {
 #[derive(Debug, Default, PartialEq, Clone)]
 #[cfg_attr(feature="paperclip", derive(Apiv2Schema))]
 #[cfg_attr(feature="serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature="apistos", derive(ApiComponent, JsonSchema))]
 pub struct Txt {
     pub name: String,
     pub txt: String,
@@ -84,6 +117,7 @@ pub struct Txt {
 #[derive(Debug, Default, PartialEq, Clone)]
 #[cfg_attr(feature="paperclip", derive(Apiv2Schema))]
 #[cfg_attr(feature="serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature="apistos", derive(ApiComponent, JsonSchema))]
 pub struct Ptr {
     pub name: String,
     pub fullname: String,
@@ -95,6 +129,7 @@ pub struct Ptr {
 #[derive(Debug, Default, PartialEq, Clone)]
 #[cfg_attr(feature="paperclip", derive(Apiv2Schema))]
 #[cfg_attr(feature="serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature="apistos", derive(ApiComponent, JsonSchema))]
 pub struct Srv {
     pub name: String,
     pub target: String,
@@ -108,6 +143,7 @@ pub struct Srv {
 #[derive(Debug, Default, PartialEq, Clone)]
 #[cfg_attr(feature="paperclip", derive(Apiv2Schema))]
 #[cfg_attr(feature="serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature="apistos", derive(ApiComponent, JsonSchema))]
 pub struct Spf {
     pub name: String,
     pub data: String,
@@ -118,6 +154,7 @@ pub struct Spf {
 #[derive(Debug, Default, PartialEq, Clone)]
 #[cfg_attr(feature="paperclip", derive(Apiv2Schema))]
 #[cfg_attr(feature="serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature="apistos", derive(ApiComponent, JsonSchema))]
 pub struct Caa {
     pub name: String,
     pub flags: u8,
@@ -130,6 +167,7 @@ pub struct Caa {
 #[derive(Debug, Default, PartialEq, Clone)]
 #[cfg_attr(feature="paperclip", derive(Apiv2Schema))]
 #[cfg_attr(feature="serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature="apistos", derive(ApiComponent, JsonSchema))]
 pub struct Ds {
     pub name: String,
     pub key_tag: String,
@@ -144,7 +182,8 @@ pub struct Ds {
 #[cfg_attr(feature="paperclip", derive(Apiv2Schema))]
 #[cfg_attr(feature="serde", derive(Deserialize, Serialize))]
 #[cfg_attr(feature="serde", serde(rename_all = "camelCase"))]
-pub struct DnsZone {
+#[cfg_attr(feature="apistos", derive(ApiComponent, JsonSchema))]
+pub struct DnsRecord {
     #[cfg_attr(feature="serde", serde(rename = "$origin",skip_serializing_if = "Option::is_none"))]
     pub origin: Option<String>,
     #[cfg_attr(feature="serde", serde(rename = "$ttl", skip_serializing_if = "Option::is_none"))]
@@ -175,7 +214,15 @@ pub struct DnsZone {
     pub ds: Option<Vec<Ds>>,
 }
 
-impl DnsZone {
+impl DnsRecord {
+    pub fn new(domain_name: String, ttl: Option<u32>, soa: Option<Soa>) -> Self {
+        Self { 
+            origin: Some(domain_name),
+            ttl: if ttl.is_some() { ttl } else { Some(3600) },
+            soa: if soa.is_some() { soa } else { Some(Soa::default()) },
+            ..Default::default()
+        }
+    }
     pub fn is_empty(&self) -> bool {
         self.origin.is_none()
             && self.ttl.is_none()

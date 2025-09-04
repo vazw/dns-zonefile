@@ -9,7 +9,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::dns_structs::*;
 
-pub fn generate(re: &Regex,options: &DnsZone, template: Option<&str>) -> String {
+pub fn generate(re: &Regex,options: &DnsRecord, template: Option<&str>) -> String {
     let mut template = template.unwrap_or(DEFAULT_TEMPLATE).to_string();
 
     template = process_origin(options.origin.as_deref(), template);
@@ -210,7 +210,7 @@ fn process_ds(data: &[Ds], template: String) -> String {
     template.replace("{ds}", &ret)
 }
 
-fn process_values(options: &DnsZone, template: String) -> String {
+fn process_values(options: &DnsRecord, template: String) -> String {
     let zone = options.origin.as_deref().unwrap_or_else(|| {
         options.soa.as_ref().map_or("", |s| &s.name)
     });

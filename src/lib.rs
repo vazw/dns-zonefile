@@ -24,7 +24,7 @@ pub struct DnsZonefile {
 /// if you want to use with serde enable feature `serde`
 /// there is also `paperclip` feature use to expose the struct to openapi specs
 /// ```rust
-/// use dns_zonefile::{DnsZone, DnsZonefile};
+/// use dns_zonefile::{DnsRecord, DnsZonefile};
 ///
 /// let dns = DnsZonefile::default();
 /// let zonefile_example = r#"
@@ -61,17 +61,17 @@ pub struct DnsZonefile {
 /// println!("{zonefile}");
 /// ```
 impl DnsZonefile {
-    /// generate Zonefile string from DnsZone data struct like so
+    /// generate Zonefile string from DnsRecord data struct like so
     /// 
-    pub fn generate(&self, dns_zone: &DnsZone, template: Option<&str>) -> String {
+    pub fn generate(&self, dns_zone: &DnsRecord, template: Option<&str>) -> String {
         generator::generate(&self.ctx.generator, dns_zone, template)
     }
-    /// parse data from zonfile to DnsZone struct
+    /// parse data from zonfile to DnsRecord struct
     ///
     /// then can convert into json later using serde
     ///
     /// THIS function **return** error for empty zone data rather then all none!
-    pub fn parse(&self, data: &str) -> Result<DnsZone, String> {
+    pub fn parse(&self, data: &str) -> Result<DnsRecord, String> {
         parser::parse(&self.ctx.parser, &self.ctx.parser_soa, data)
     }
 }
@@ -89,10 +89,10 @@ impl Default for DnsZonefile {
 
 #[cfg(test)]
 mod tests {
-    use super::{DnsZonefile, DnsZone};
+    use super::{DnsZonefile, DnsRecord};
     use std::fs;
 
-    fn get_forward_zone_json() -> DnsZone {
+    fn get_forward_zone_json() -> DnsRecord {
         let json_str = fs::read_to_string("tests/zonefile_forward.json")
             .expect("Failed to read zonefile_forward.json");
         serde_json::from_str(&json_str).expect("Failed to parse zonefile_forward.json")
@@ -143,14 +143,14 @@ mod tests {
     }
 
 
-     fn get_parsed_forward_zone() -> DnsZone {
+     fn get_parsed_forward_zone() -> DnsRecord {
         let text = fs::read_to_string("tests/zonefile_forward.txt")
             .expect("Failed to read zonefile_forward.txt");
         let dns_zonefile = DnsZonefile::default();
         dns_zonefile.parse(&text).unwrap()
     }
 
-    fn get_expected_forward_zone_json() -> DnsZone {
+    fn get_expected_forward_zone_json() -> DnsRecord {
         let json_str = fs::read_to_string("tests/zonefile_forward.json")
             .expect("Failed to read zonefile_forward.json");
         serde_json::from_str(&json_str).expect("Failed to parse zonefile_forward.json")
@@ -207,5 +207,11 @@ mod tests {
 
         // 5. The two JSON objects should be deeply equal
         assert_eq!(json1, json2, "Parsed objects should be equal after a generate/parse cycle.");
+    }
+
+    #[test]
+    fn test_empty_struct() {
+        let dns_record = DnsRecord::default();
+        assert_eq!(dns_record.is_empty(), true);
     }
 }
