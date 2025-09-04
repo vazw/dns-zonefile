@@ -42,7 +42,7 @@ fn parse_soa(rr_tokens: &[&str]) -> Soa {
         name: rr_tokens[0].to_string(),
         mname: rr_tokens[l - 7].to_string(),
         rname: rr_tokens[l - 6].to_string(),
-        serial: rr_tokens[l - 5].parse().unwrap_or(0),
+        serial: rr_tokens[l - 5].parse().unwrap_or_default(),
         refresh: rr_tokens[l - 4].parse().unwrap_or(0),
         retry: rr_tokens[l - 3].parse().unwrap_or(0),
         expire: rr_tokens[l - 2].parse().unwrap_or(0),
@@ -296,8 +296,8 @@ fn normalize_rr(rr: &str) -> NormalizedRR {
     }
 }
 
-fn parse_rrs(text: &str) -> DnsZone {
-    let mut zone = DnsZone::default();
+fn parse_rrs(text: &str) -> DnsRecord {
+    let mut zone = DnsRecord::default();
     let rrs = text.lines();
 
     for rr in rrs {
@@ -368,7 +368,7 @@ fn parse_rrs(text: &str) -> DnsZone {
     zone
 }
 
-pub fn parse(re_ws: &Regex, re_soa: &Regex,text: &str) -> Result<DnsZone, String> {
+pub fn parse(re_ws: &Regex, re_soa: &Regex,text: &str) -> Result<DnsRecord, String> {
     let without_comments = remove_comments(text);
     let flattened = flatten_soa(re_soa, re_ws, &without_comments);
     let dns_zone = parse_rrs(&flattened);

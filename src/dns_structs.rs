@@ -51,6 +51,40 @@ impl Display for Serial {
 #[derive(Debug, Default, PartialEq, Clone)]
 #[cfg_attr(feature="paperclip", derive(Apiv2Schema))]
 #[cfg_attr(feature="serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature="apistos", derive(ApiComponent, JsonSchema))]
+pub struct Soa {
+    pub name: String,
+    #[cfg_attr(feature="serde", serde(skip_serializing_if = "Option::is_none"))]
+    pub ttl: Option<u32>,
+    pub mname: String,
+    pub rname: String,
+    pub serial: Serial,
+    pub refresh: u32,
+    pub retry: u32,
+    pub expire: u32,
+    pub minimum: u32,
+}
+
+impl Soa {
+    pub fn new(ttl: u32, mname: String, rname: String, serial: String, refresh: u32, retry: u32, expire: u32, minimum: u32) -> Self {
+        Self {
+        name: "@".to_owned(),
+        ttl: Some(ttl),
+        mname,
+        rname,
+        serial: Serial::String(serial),
+        refresh,
+        retry,
+        expire,
+        minimum,
+    }
+    }
+}
+
+#[derive(Debug, Default, PartialEq, Clone)]
+#[cfg_attr(feature="paperclip", derive(Apiv2Schema))]
+#[cfg_attr(feature="serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature="apistos", derive(ApiComponent, JsonSchema))]
 pub struct Ns {
     pub name: String,
     pub host: String,
